@@ -239,29 +239,30 @@ def setup_confirmation_page(app):
     app.stopLabelFrame()
 
 
-def copy_files(app):
-    total_files = len(data_filtered_games)
-    app.setMeter("copy progress", 0)
-    num_copied_files = 0
-    from_dir = app.getEntry('rom_input_dir')
-    to_dir = app.getEntry('rom_output_dir')
-    skipped_games = []
-    for game in data_filtered_games:
-        if not path.exists(PurePath(from_dir, "%s.zip" % game)):
-            # Maybe it's a directory instead?
-            if not path.exists(PurePath(from_dir, game)):
-                skipped_games.append(game)
-            else:
-                copytree(PurePath(from_dir, game), PurePath(to_dir, game))
-        else:
-            copy2(PurePath(from_dir, "%s.zip" % game), PurePath(to_dir, "%s.zip" % game))
-        num_copied_files += 1
-        app.setMeter("copy progress", (num_copied_files / total_files) * 100)
-        app.setLabel("now copying", "Now Copying: %s" % game)
-    app.setLabel("now copying", "Done! Skipped copying these games: %s" % (' '.join(skipped_games)))
-
-
 with gui(APP_NAME, "640x480") as app:
+    def copy_files():
+        total_files = len(data_filtered_games)
+        app.queueFunction(app.setMeter, "copy progress", 0)
+        num_copied_files = 0
+        from_dir = app.getEntry('rom_input_dir')
+        to_dir = app.getEntry('rom_output_dir')
+        skipped_games = []
+        for game in data_filtered_games:
+            if not path.exists(PurePath(from_dir, "%s.zip" % game)):
+                # Maybe it's a directory instead?
+                if not path.exists(PurePath(from_dir, game)):
+                    skipped_games.append(game)
+                else:
+                    copytree(PurePath(from_dir, game), PurePath(to_dir, game))
+            else:
+                copy2(PurePath(from_dir, "%s.zip" % game), PurePath(to_dir, "%s.zip" % game))
+            num_copied_files += 1
+            app.queueFunction(app.setMeter, "copy progress", (num_copied_files / total_files) * 100)
+            app.queueFunction(app.setLabel, "now copying", "Now Copying: %s" % game)
+        app.queueFunction(app.setLabel, "now copying",
+                          "Done! Skipped copying these games: %s" % (' '.join(skipped_games)))
+
+
     def on_page_changed():
         page_number = app.getPagedWindowPageNumber(WINDOW_NAME)
         if page_number == 2:
@@ -293,7 +294,7 @@ with gui(APP_NAME, "640x480") as app:
         if page_number == 3:
             setup_confirmation_page(app)
         if page_number == 4:
-            copy_files(app)
+            app.thread(copy_files)
 
 
     app.startPagedWindow(WINDOW_NAME)
