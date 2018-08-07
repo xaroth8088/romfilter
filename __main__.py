@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import configparser
 import re
 from functools import partial
-from shutil import copy2
+from shutil import copy2, copytree
 from pathlib import PurePath
 from os import path
 
@@ -248,7 +248,11 @@ def copy_files(app):
     skipped_games = []
     for game in data_filtered_games:
         if not path.exists(PurePath(from_dir, "%s.zip" % game)):
-            skipped_games.append(game)
+            # Maybe it's a directory instead?
+            if not path.exists(PurePath(from_dir, game)):
+                skipped_games.append(game)
+            else:
+                copytree(PurePath(from_dir, game), PurePath(to_dir, game))
         else:
             copy2(PurePath(from_dir, "%s.zip" % game), PurePath(to_dir, "%s.zip" % game))
         num_copied_files += 1
