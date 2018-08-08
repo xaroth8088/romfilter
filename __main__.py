@@ -197,9 +197,10 @@ def refresh_filtered_games(app):
 
     button_filters = [
         str(num_buttons)
-        for num_buttons in range(0, int(app.getSpinBox("buttons")))
+        for num_buttons in range(0, int(app.getSpinBox("buttons")) + 1)
         ]
     button_filters.append('None')
+    button_filters.append('mixed')
     games = filter_games(data_control_buttons, button_filters, games)
 
     emulation_filters = [

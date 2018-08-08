@@ -11,6 +11,11 @@ This project is extremely early in its development.  Nonetheless, if you'd like 
 * Enough spare disk space to have the copy of all of your ROMs
 ** This is because this utility is non-destructive.  We wouldn't want to accidentally nuke your collection!
 
+# Known issues
+* If a ROM relies on another ROM to run (e.g. all NeoGeo games rely on having `neogeo.zip` in the roms path), this
+relationship is not currently picked up, so you'll need to manually copy them over for now.
+* While parsing out the XML and category files, the UI will hang.  Be patient, and it'll come back eventually.
+
 # Development
 ## Building the standalone Windows executable
 In a Python 3.6 virtual environment where requirements.txt has already been installed:
